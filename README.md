@@ -64,42 +64,6 @@ The image is non-root, exposes `8088`, persists SQLite under `/data`, and
 ships a `HEALTHCHECK` against `/api/health`. Override any of the env vars
 from the table above to tune host/port/DB path/rate limit/allowed origins.
 
-## Publishing (manual GitHub upload)
-
-You don't need git installed locally. Use github.com directly:
-
-1. **Create the repo**
-   - github.com → **New repository** → name it `lying-minesweeper`.
-   - Visibility: **Public** (required for free GHCR pulls without auth).
-   - **Don't** initialize with README/license — this repo already has them.
-
-2. **Upload the project files**
-   - On the empty-repo landing page click **"uploading an existing file"**.
-   - Drag the project folder into the browser. **Skip these** (they're
-     runtime artifacts, not source):
-     - `server/__pycache__/`
-     - `server/leaderboard.db`, `server/leaderboard.db-shm`,
-       `server/leaderboard.db-wal`
-     - any local `data/` folder created by `docker compose`
-   - Commit directly to `main` with message `Initial commit`.
-
-3. **Cut the first release to build the image**
-   - **Releases → Create a new release → Choose a tag → `v1.0.0` →
-     Publish release**.
-   - This pushes the tag, which triggers
-     `.github/workflows/publish-image.yml`. Watch it under the
-     **Actions** tab — first build takes ~3–5 minutes.
-   - The image appears at
-     `ghcr.io/<your-user>/lying-minesweeper:v1.0.0` (and `latest`,
-     `1`, `1.0`, plus a short-SHA tag).
-
-4. **One-time: make the package public**
-   - Your GitHub profile → **Packages** tab → `lying-minesweeper` →
-     **Package settings** → **Change visibility** → **Public**. Without
-     this step, `docker pull` requires `docker login ghcr.io`.
-
-Subsequent releases: bump the tag (`v1.0.1`, `v1.1.0`, …) via the
-**Releases** UI and the workflow republishes automatically.
 
 ## How the game works
 
@@ -130,28 +94,6 @@ The server tracks per-seed, weekly, and "most tricked" leaderboards plus a
 silent cheater wall. The daily puzzle seed is HMAC'd from the UTC date with
 the server's secret, so every player gets the same board.
 
-## Security model
-
-The API is intended to be reachable **only** from the game UI served from
-the same origin. The server enforces this with multiple checks:
-
-- **Same-origin policy on every `/api/*` request** (except `/api/health`):
-  - Prefer `Sec-Fetch-Site: same-origin` (all modern browsers).
-  - Fall back to `Origin` / `Referer` whose host matches the request's
-    `Host` (or any entry in `LMS_ALLOWED_ORIGINS`).
-  - Missing all three signals → `403`.
-- **CORS** never returns `*` — the validated Origin is echoed back, with
-  `Allow-Credentials: false`.
-- **Per-IP rate limit** on writes (token bucket, configurable).
-- **Replay-verified anti-cheat** for wins (full board replay + minimum-time
-  gate). Failures yield a silent success and bank the username on the
-  cheater wall.
-- **Hardened response headers** on everything: `X-Content-Type-Options`,
-  `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`,
-  `Permissions-Policy` (geolocation/microphone/camera/topics off), and a
-  strict `Content-Security-Policy` on the HTML.
-- **No external dependencies** — Python stdlib only, no JS frameworks, no
-  CDN-loaded assets.
 
 ## Repository layout
 
