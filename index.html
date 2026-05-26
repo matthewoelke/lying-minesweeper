@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes" />
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'" />
+  <meta http-equiv="X-Frame-Options" content="DENY" />
+  <meta name="referrer" content="same-origin" />
+  <title>Lying Minesweeper</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="status-bar" id="status-bar">
+    <div class="status-group">
+      <label for="difficulty">Difficulty</label>
+      <select id="difficulty" aria-label="Difficulty">
+        <option value="beginner">Beginner (9×9, 10)</option>
+        <option value="intermediate" selected>Intermediate (16×16, 40)</option>
+        <option value="expert">Expert (30×16, 99)</option>
+      </select>
+    </div>
+    <div class="status-group" aria-live="polite">
+      <span class="counter" title="Mines remaining">💣 <span id="mines-remaining">0</span></span>
+      <span class="counter" title="Elapsed time">⏱ <span id="timer">0</span>s</span>
+      <span id="practice-badge" class="practice-badge hidden" title="Replays do not count for scoring">Practice</span>
+    </div>
+    <div class="status-group">
+      <button type="button" id="new-game">New Game</button>
+      <button type="button" id="restart-game" disabled title="Replay this same board">Restart</button>
+      <button type="button" id="share-game" disabled title="Copy a link to replay this exact board">Share</button>
+      <button type="button" id="game-of-day" title="Play today's shared puzzle">⭐ Daily</button>
+      <button type="button" id="toggle-leaderboard" title="Show leaderboards">🏆</button>
+      <span id="share-status" class="share-status" aria-live="polite"></span>
+    </div>
+    <div class="status-group">
+      <span class="username-chip" title="Click to change">
+        Player: <button type="button" id="username-display" class="username-display">…</button>
+      </span>
+    </div>
+  </header>
+
+  <div id="username-backdrop" class="username-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="username-title" aria-hidden="true">
+    <div class="username-modal">
+      <h2 id="username-title">Pick a name</h2>
+      <p class="username-help">Up to 20 letters/digits. Used for leaderboards.</p>
+      <div class="username-row">
+        <input id="username-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" maxlength="20" pattern="[A-Za-z0-9]{1,20}" />
+        <button type="button" id="username-reroll" title="Generate a random name">🎲</button>
+      </div>
+      <p id="username-error" class="username-error" aria-live="polite"></p>
+      <div class="modal-actions">
+        <button type="button" id="username-save">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-layout">
+  <main>
+    <div class="board-wrap">
+      <div id="board" class="board" role="grid" aria-label="Minesweeper board"></div>
+    </div>
+  </main>
+
+  <aside id="leaderboard-panel" class="leaderboard-panel hidden" aria-hidden="true">
+    <header class="leaderboard-head">
+      <h2>Leaderboards</h2>
+      <button type="button" id="leaderboard-close" aria-label="Close">×</button>
+    </header>
+    <div class="leaderboard-tabs" role="tablist">
+      <button type="button" class="lb-tab active" data-kind="week">This Week</button>
+      <button type="button" class="lb-tab" data-kind="seed">This Board</button>
+      <button type="button" class="lb-tab" data-kind="tricked">Most Tricked</button>
+      <button type="button" class="lb-tab" data-kind="cheaters">Cheaters</button>
+    </div>
+    <div class="leaderboard-body" id="leaderboard-body" aria-live="polite">
+      <p class="lb-empty">Loading…</p>
+    </div>
+  </aside>
+  </div><!-- /.app-layout -->
+
+  <div id="modal-backdrop" class="endgame-card hidden" role="dialog" aria-modal="false" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal">
+      <header class="modal-drag-handle" id="modal-drag-handle" title="Drag to move">
+        <h2 id="modal-title">Game Over</h2>
+        <button type="button" id="modal-close" class="modal-close" aria-label="Close">×</button>
+      </header>
+      <p id="modal-body"></p>
+      <p id="modal-trick" class="modal-trick hidden">🪤 A <span class="liar-label">lying tile</span> tricked you!</p>
+      <div class="modal-actions">
+        <button type="button" id="modal-share" title="Copy a link to this exact board">Share</button>
+        <button type="button" id="modal-replay" title="Play this same board again">Replay</button>
+        <button type="button" id="modal-new-game">New Game</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

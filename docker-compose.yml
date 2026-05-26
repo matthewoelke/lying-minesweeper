@@ -1,0 +1,30 @@
+services:
+  lying-minesweeper:
+    build: .
+    image: lying-minesweeper:local
+    container_name: lying-minesweeper
+    restart: unless-stopped
+    ports:
+      - "8088:8088"
+    volumes:
+      # Persist the SQLite leaderboard between container restarts.
+      - ./data:/data
+    environment:
+      LMS_HOST: "0.0.0.0"
+      LMS_PORT: "8088"
+      LMS_DB_PATH: "/data/leaderboard.db"
+      # Tighten or relax the per-IP write rate limit (requests/min):
+      # LMS_RATE_LIMIT_PER_MIN: "60"
+      # If you sit this container behind a reverse proxy on a different
+      # host, list the public origins your browser will use (comma-separated):
+      # LMS_ALLOWED_ORIGINS: "https://lyingminesweeper.example.com"
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8088/api/health',timeout=3).status==200 else 1)"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
