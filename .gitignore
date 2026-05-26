@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# SQLite runtime artifacts
+*.db
+*.db-shm
+*.db-wal
+
+# Local data volume (from docker-compose)
+data/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and scratch
+*.log
+*.tmp
+
+# Session/agent state
+.copilot/
+plan.md

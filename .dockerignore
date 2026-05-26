@@ -1,0 +1,32 @@
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.venv/
+venv/
+
+# SQLite runtime artifacts (DB is created fresh in /data at first run)
+**/*.db
+**/*.db-shm
+**/*.db-wal
+
+# Git / CI / editor / OS
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Session/agent state
+.copilot/
+plan.md
+session-state/
+
+# Build/test scratch
+data/
+docker-compose.yml
+Dockerfile
+.dockerignore
